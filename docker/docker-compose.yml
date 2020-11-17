@@ -11,11 +11,11 @@ services:
         ports:
             - "8001:3306"
     server:
-        build: ./server
+        build: ..
         image: easyappointments-server:v1
         container_name: easyappointments-server
         ports:
             - "8000:80"
         volumes:
-            - ../:/var/www/html
-            - ./server/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+            - ../application/:/var/www/html/application
+            - ./docker/server/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini
