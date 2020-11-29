@@ -358,12 +358,15 @@ class Availabilities extends API_V1_Controller {
         {
             $start_hour = new DateTime($selected_date . ' ' . $period['start']);
             $end_hour = new DateTime($selected_date . ' ' . $period['end']);
+            if($period['end'] == '00:00') {
+                $end_hour->modify('+1 day');
+            }
             $interval = $availabilities_type === AVAILABILITIES_TYPE_FIXED ? (int)$service_duration : 15;
 
             $current_hour = $start_hour;
             $diff = $current_hour->diff($end_hour);
 
-            while (($diff->h * 60 + $diff->i) >= intval($service_duration))
+            while ((($diff->d * 24 * 60) + ($diff->h * 60) + $diff->i) >= intval($service_duration))
             {
                 $available_hours[] = $current_hour->format('H:i');
                 $current_hour->add(new DateInterval('PT' . $interval . 'M'));

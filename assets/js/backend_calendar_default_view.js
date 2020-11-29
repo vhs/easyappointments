@@ -1200,7 +1200,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                             workDateEnd.hour(parseInt(endHour[0]));
                             workDateEnd.minute(parseInt(endHour[1]));
 
-                            if (viewEnd > workDateEnd) {
+                            if (viewEnd > workDateEnd && sortedWorkingPlan[weekdayName].end != '00:00') {
                                 var unavailablePeriodAfterWorkEnds = {
                                     title: EALang.not_working,
                                     start: workDateEnd,
@@ -1319,7 +1319,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                                 workDateEnd.hour(parseInt(endHour[0]));
                                 workDateEnd.minute(parseInt(endHour[1]));
 
-                                if (calendarView.end > workDateEnd) {
+                                if (calendarView.end > workDateEnd && sortedWorkingPlan[weekdayName].end != '00:00') {
                                     unavailabilityEvent = {
                                         title: EALang.not_working,
                                         start: moment(calendarDate.format('YYYY-MM-DD') + ' ' + sortedWorkingPlan[weekdayName].end + ':00'),

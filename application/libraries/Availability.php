@@ -125,6 +125,9 @@ class Availability {
 
             $day_start = new DateTime($date_working_plan['start']);
             $day_end = new DateTime($date_working_plan['end']);
+            if($date_working_plan['end'] == '00:00') {
+                $day_end->modify('+1 day');
+            }
 
             // Split the working plan to available time periods that do not contain the breaks in them.
             foreach ($date_working_plan['breaks'] as $index => $break)
@@ -151,6 +154,9 @@ class Availability {
                 {
                     $period_start = new DateTime($period['start']);
                     $period_end = new DateTime($period['end']);
+                    if($period['end'] == '00:00') {
+                        $period_end->modify('+1 day');
+                    }
 
                     $remove_current_period = FALSE;
 
@@ -202,6 +208,10 @@ class Availability {
 
                 $period_start = new DateTime($date . ' ' . $period['start']);
                 $period_end = new DateTime($date . ' ' . $period['end']);
+
+                if($period['end'] == '00:00') {
+                    $period_end->modify('+1 day');
+                }
 
                 if ($appointment_start <= $period_start && $appointment_end <= $period_end && $appointment_end <= $period_start)
                 {
@@ -300,12 +310,16 @@ class Availability {
         {
             $start_hour = new DateTime($date . ' ' . $period['start']);
             $end_hour = new DateTime($date . ' ' . $period['end']);
+            if($period['end'] == '00:00') {
+                $end_hour->modify('+1 day');
+            }
+
             $interval = $service['availabilities_type'] === AVAILABILITIES_TYPE_FIXED ? (int)$service['duration'] : 15;
 
             $current_hour = $start_hour;
             $diff = $current_hour->diff($end_hour);
 
-            while (($diff->h * 60 + $diff->i) >= (int)$service['duration'])
+            while ((($diff->d * 24*60) + ($diff->h * 60) + $diff->i) >= (int)$service['duration'])
             {
                 $available_hours[] = $current_hour->format('H:i');
                 $current_hour->add(new DateInterval('PT' . $interval . 'M'));

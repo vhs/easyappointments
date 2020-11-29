@@ -590,10 +590,17 @@ class Appointments extends CI_Controller {
             $appointment_end = new DateTime($appointment['start_datetime']);
             $appointment_end->add(new DateInterval('PT' . $service['duration'] . 'M'));
             $appointment_end = $appointment_end->format('H:i');
+            if($appointment_end->format('H:i') == '00:00') {
+                $appointment_end->modify('+1 day');
+            }
 
             $available_period_start = date('H:i', strtotime($available_period['start']));
-            $available_period_end = date('H:i', strtotime($available_period['end']));
-
+            if($available_period['end'] == '00:00') {
+                $available_period_end = strtotime($available_period['end'] . ' +1 day');
+            } else {
+                $available_period_end = strtotime($available_period['end']);
+            }
+            //todo this may not work right still, need to double check and maybe make them all datetimes.
             if ($available_period_start <= $appointment_start && $available_period_end >= $appointment_end)
             {
                 $is_still_available = TRUE;

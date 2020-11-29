@@ -91,11 +91,6 @@ window.BackendCalendarTableView = window.BackendCalendarTableView || {};
 
                                 $providerColumn.find('.calendar-wrapper').fullCalendar('removeEvents');
 
-                                createNonWorkingHours(
-                                    $providerColumn.find('.calendar-wrapper'),
-                                    $providerColumn.data('provider')
-                                );
-
                                 // Add the appointments to the column.
                                 createAppointments($providerColumn, response.appointments);
 
@@ -622,12 +617,6 @@ window.BackendCalendarTableView = window.BackendCalendarTableView || {};
 
         // Create calendar.
         createCalendar($providerColumn, date, provider);
-
-        // Create non working hours.
-        createNonWorkingHours(
-            $providerColumn.find('.calendar-wrapper'),
-            provider
-        );
 
         // Add the appointments to the column.
         createAppointments($providerColumn, events.appointments);
