@@ -30,15 +30,15 @@ class Config {
     // GENERAL SETTINGS
     // ------------------------------------------------------------------------
 
-    const BASE_URL      = 'http://url-to-easyappointments-directory';
+    const BASE_URL      = 'http://localhost';
     const LANGUAGE      = 'english';
-    const DEBUG_MODE    = FALSE;
+    const DEBUG_MODE    = true;
 
     // ------------------------------------------------------------------------
     // DATABASE SETTINGS
     // ------------------------------------------------------------------------
 
-    const DB_HOST       = 'localhost';
+    const DB_HOST       = 'mysql';
     const DB_NAME       = 'easyappointments';
     const DB_USERNAME   = 'root';
     const DB_PASSWORD   = 'root';
