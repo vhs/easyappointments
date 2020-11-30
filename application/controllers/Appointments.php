@@ -585,22 +585,21 @@ class Appointments extends CI_Controller {
         foreach ($available_periods as $available_period)
         {
             $appointment_start = new DateTime($appointment['start_datetime']);
-            $appointment_start = $appointment_start->format('H:i');
-
             $appointment_end = new DateTime($appointment['start_datetime']);
             $appointment_end->add(new DateInterval('PT' . $service['duration'] . 'M'));
-            $appointment_end = $appointment_end->format('H:i');
-            if($appointment_end->format('H:i') == '00:00') {
-                $appointment_end->modify('+1 day');
+
+            $available_period_start = new DateTime($appointment['start_datetime']);
+            list($available_period_start_hour, $available_period_start_minute) = explode(":", $available_period['start']);
+            $available_period_start->setTime($available_period_start_hour, $available_period_start_minute);
+
+            $available_period_end = new DateTime($appointment['start_datetime']);
+            list($available_period_end_hour, $available_period_end_minute) = explode(":", $available_period['end']);
+            $available_period_end->setTime($available_period_end_hour, $available_period_end_minute);
+
+            if($available_period['end'] == '00:00') {
+                $available_period_end->modify('+1 day');
             }
 
-            $available_period_start = date('H:i', strtotime($available_period['start']));
-            if($available_period['end'] == '00:00') {
-                $available_period_end = strtotime($available_period['end'] . ' +1 day');
-            } else {
-                $available_period_end = strtotime($available_period['end']);
-            }
-            //todo this may not work right still, need to double check and maybe make them all datetimes.
             if ($available_period_start <= $appointment_start && $available_period_end >= $appointment_end)
             {
                 $is_still_available = TRUE;
