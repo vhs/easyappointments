@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /*
 |--------------------------------------------------------------------------
@@ -9,7 +9,7 @@
 |
 */
 $config['version'] = '1.4.0'; // This must be changed manually.
-$config['release_label'] = 'Beta.1'; // Leave empty for no title or add Alpha, Beta etc ...
+$config['release_label'] = ''; // Leave empty for no title or add Alpha, Beta etc ...
 $config['debug'] = Config::DEBUG_MODE;
 
 /*
@@ -94,6 +94,7 @@ $config['language'] = isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) ?
         'fr' => 'french',
         'de' => 'german',
         'el' => 'greek',
+        'he' => 'hebrew',
         'hi' => 'hindi',
         'hu' => 'hungarian',
         'it' => 'italian',
@@ -132,6 +133,7 @@ $config['available_languages'] = [
     'french',
     'german',
     'greek',
+    'hebrew',
     'hindi',
     'hungarian',
     'italian',
@@ -183,7 +185,7 @@ $config['enable_hooks'] = TRUE;
 | http://codeigniter.com/user_guide/general/creating_libraries.html
 |
 */
-$config['subclass_prefix'] = 'MY_';
+$config['subclass_prefix'] = 'EA_';
 
 
 /*
@@ -302,7 +304,7 @@ $config['cache_path'] = __DIR__ . '/../../storage/cache/';
 | new release.
 |
 */
-$config['cache_busting_token'] = '824HX';
+$config['cache_busting_token'] = '729RF';
 
 /*
 |--------------------------------------------------------------------------
@@ -313,7 +315,7 @@ $config['cache_busting_token'] = '824HX';
 | MUST set an encryption key.  See the user guide for info.
 |
 */
-$config['encryption_key'] = Config::BASE_URL;
+$config['encryption_key'] = base64_encode(APPPATH);
 
 /*
 |--------------------------------------------------------------------------

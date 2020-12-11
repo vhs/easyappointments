@@ -20,9 +20,9 @@
  */
 class Timezones {
     /**
-     * @var CI_Controller
+     * @var EA_Controller
      */
-    protected $framework;
+    protected $CI;
 
     /**
      * @var string
@@ -464,13 +464,14 @@ class Timezones {
         ],
     ];
 
+    /**
+     * Timezones constructor.
+     */
     public function __construct()
     {
-        $this->framework = & get_instance();
+        $this->CI = & get_instance();
 
-        $this->framework->load->model('user_model');
-
-        $this->framework->load->library('session');
+        $this->CI->load->model('user_model');
     }
 
     /**
@@ -499,7 +500,7 @@ class Timezones {
             throw new Exception('The provided event does not have the required properties: ' . print_r($event));
         }
 
-        $user_timezone = $this->framework->user_model->get_user_timezone($event['id_users_provider']);
+        $user_timezone = $this->CI->user_model->get_user_timezone($event['id_users_provider']);
 
         $session_timezone = $this->get_session_timezone();
 
@@ -522,8 +523,8 @@ class Timezones {
     {
         $default_timezone = $this->get_default_timezone();
 
-        return $this->framework->session->has_userdata('timezone')
-            ? $this->framework->session->userdata('timezone')
+        return $this->CI->session->has_userdata('timezone')
+            ? $this->CI->session->userdata('timezone')
             : $default_timezone;
     }
 
@@ -550,7 +551,7 @@ class Timezones {
      */
     public function convert($value, $from_timezone, $to_timezone)
     {
-        if ( ! $to_timezone)
+        if ( ! $to_timezone || $from_timezone === $to_timezone)
         {
             return $value;
         }

@@ -14,12 +14,9 @@
 /**
  * Roles Model
  *
- * @property CI_DB_query_builder $db
- * @property CI_Loader $load
- *
  * @package Models
  */
-class Roles_Model extends CI_Model {
+class Roles_model extends EA_Model {
     /**
      * Get the record id of a particular role.
      *
@@ -47,8 +44,8 @@ class Roles_Model extends CI_Model {
         $privileges = $this->db->get_where('roles', ['slug' => $slug])->row_array();
         unset($privileges['id'], $privileges['name'], $privileges['slug'], $privileges['is_admin']);
 
-        // Convert the int values to bool so that is easier to check whether a
-        // user has the required privileges for a specific action.
+        // Convert the int values to bool so that is easier to check whether a user has the required privileges for a
+        // specific action.
         foreach ($privileges as &$value)
         {
             $privileges_number = $value;

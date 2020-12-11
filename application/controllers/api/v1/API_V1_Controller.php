@@ -6,8 +6,8 @@
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) 2013 - 2020, Alex Tselegidis
- * @license     http://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        http://easyappointments.org
+ * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
+ * @link        https://easyappointments.org
  * @since       v1.2.0
  * ---------------------------------------------------------------------------- */
 
@@ -22,7 +22,7 @@ use EA\Engine\Types\NonEmptyText;
  *
  * @package Controllers
  */
-class API_V1_Controller extends CI_Controller {
+class API_V1_Controller extends EA_Controller {
     /**
      * Class Constructor
      *
@@ -45,14 +45,14 @@ class API_V1_Controller extends CI_Controller {
 
             $authorization = new Authorization($this);
 
-            if ( ! empty($api_token) && $api_token === $this->_getBearerToken())
+            if ( ! empty($api_token) && $api_token === $this->get_bearer_token())
             {
                 return;
             }
 
             if ( ! isset($_SERVER['PHP_AUTH_USER']))
             {
-                $this->_requestAuthentication();
+                $this->request_authentication();
                 return;
             }
 
@@ -62,7 +62,8 @@ class API_V1_Controller extends CI_Controller {
         }
         catch (Exception $exception)
         {
-            exit($this->handle_exception($exception));
+            $this->handle_exception($exception);
+            exit;
         }
     }
 
@@ -71,9 +72,9 @@ class API_V1_Controller extends CI_Controller {
      *
      * @return string
      */
-    protected function _getBearerToken()
+    protected function get_bearer_token()
     {
-        $headers = $this->_getAuthorizationHeader();
+        $headers = $this->get_authorization_header();
 
         // HEADER: Get the access token from the header
 
@@ -92,7 +93,7 @@ class API_V1_Controller extends CI_Controller {
      *
      * @return string
      */
-    protected function _getAuthorizationHeader()
+    protected function get_authorization_header()
     {
         $headers = NULL;
 
@@ -128,7 +129,7 @@ class API_V1_Controller extends CI_Controller {
     /**
      * Sets request authentication headers.
      */
-    protected function _requestAuthentication()
+    protected function request_authentication()
     {
         header('WWW-Authenticate: Basic realm="Easy!Appointments"');
         header('HTTP/1.0 401 Unauthorized');
@@ -150,7 +151,7 @@ class API_V1_Controller extends CI_Controller {
         ];
 
         $header = $exception instanceof \EA\Engine\Api\V1\Exception
-            ? $exception->getCode() . ' ' . $exception->getHeader()
+            ? $exception->getCode() . ' ' . $exception->get_header()
             : '500 Internal Server Error';
 
         header('HTTP/1.0 ' . $header);

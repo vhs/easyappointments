@@ -24,9 +24,9 @@ class Google_Sync {
     /**
      * CodeIgniter Instance
      *
-     * @var CI_Controller
+     * @var EA_Controller
      */
-    protected $framework;
+    protected $CI;
 
     /**
      * Google API Client
@@ -50,18 +50,17 @@ class Google_Sync {
      */
     public function __construct()
     {
-        $this->framework =& get_instance();
-
-        $this->framework->load->library('session');
+        $this->CI =& get_instance();
 
         // Initialize google client and calendar service.
         $this->client = new Google_Client();
 
-        $this->client->setApplicationName($this->framework->config->item('google_application_name'));
-        $this->client->setClientId($this->framework->config->item('google_client_id'));
-        $this->client->setClientSecret($this->framework->config->item('google_client_secret'));
-        $this->client->setDeveloperKey($this->framework->config->item('google_api_key'));
+        $this->client->setApplicationName(config('google_application_name'));
+        $this->client->setClientId(config('google_client_id'));
+        $this->client->setClientSecret(config('google_client_secret'));
+        $this->client->setDeveloperKey(config('google_api_key'));
         $this->client->setRedirectUri(site_url('google/oauth_callback'));
+        $this->client->setPrompt('consent');
         $this->client->setAccessType('offline');
         $this->client->addScope([
             Google_Service_Calendar::CALENDAR,
@@ -145,19 +144,21 @@ class Google_Sync {
      */
     public function add_appointment($appointment, $provider, $service, $customer, $settings)
     {
-        $this->framework->load->helper('general');
+        $this->CI->load->helper('general');
 
         $event = new Google_Service_Calendar_Event();
         $event->setSummary(($service != NULL) ? $service['name'] : 'Unavailable');
         $event->setDescription($appointment['notes']);
         $event->setLocation(isset($appointment['location']) ? $appointment['location'] : $settings['company_name']);
 
+        $timezone = new DateTimeZone($provider['timezone']);
+
         $start = new Google_Service_Calendar_EventDateTime();
-        $start->setDateTime(date3339(strtotime($appointment['start_datetime'])));
+        $start->setDateTime((new DateTime($appointment['start_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setStart($start);
 
         $end = new Google_Service_Calendar_EventDateTime();
-        $end->setDateTime(date3339(strtotime($appointment['end_datetime'])));
+        $end->setDateTime((new DateTime($appointment['end_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setEnd($end);
 
         $event->attendees = [];
@@ -171,8 +172,7 @@ class Google_Sync {
         if ($customer != NULL)
         {
             $event_customer = new Google_Service_Calendar_EventAttendee();
-            $event_customer->setDisplayName($customer['first_name'] . ' '
-                . $customer['last_name']);
+            $event_customer->setDisplayName($customer['first_name'] . ' ' . $customer['last_name']);
             $event_customer->setEmail($customer['email']);
             $event->attendees[] = $event_customer;
         }
@@ -199,7 +199,7 @@ class Google_Sync {
      */
     public function update_appointment($appointment, $provider, $service, $customer, $settings)
     {
-        $this->framework->load->helper('general');
+        $this->CI->load->helper('general');
 
         $event = $this->service->events->get($provider['settings']['google_calendar'],
             $appointment['id_google_calendar']);
@@ -208,19 +208,20 @@ class Google_Sync {
         $event->setDescription($appointment['notes']);
         $event->setLocation(isset($appointment['location']) ? $appointment['location'] : $settings['company_name']);
 
+        $timezone = new DateTimeZone($provider['timezone']);
+
         $start = new Google_Service_Calendar_EventDateTime();
-        $start->setDateTime(date3339(strtotime($appointment['start_datetime'])));
+        $start->setDateTime((new DateTime($appointment['start_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setStart($start);
 
         $end = new Google_Service_Calendar_EventDateTime();
-        $end->setDateTime(date3339(strtotime($appointment['end_datetime'])));
+        $end->setDateTime((new DateTime($appointment['end_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setEnd($end);
 
         $event->attendees = [];
 
         $event_provider = new Google_Service_Calendar_EventAttendee();
-        $event_provider->setDisplayName($provider['first_name'] . ' '
-            . $provider['last_name']);
+        $event_provider->setDisplayName($provider['first_name'] . ' ' . $provider['last_name']);
         $event_provider->setEmail($provider['email']);
         $event->attendees[] = $event_provider;
 
@@ -268,18 +269,20 @@ class Google_Sync {
      */
     public function add_unavailable($provider, $unavailable)
     {
-        $this->framework->load->helper('general');
+        $this->CI->load->helper('general');
 
         $event = new Google_Service_Calendar_Event();
         $event->setSummary('Unavailable');
         $event->setDescription($unavailable['notes']);
 
+        $timezone = new DateTimeZone($provider['timezone']);
+
         $start = new Google_Service_Calendar_EventDateTime();
-        $start->setDateTime(date3339(strtotime($unavailable['start_datetime'])));
+        $start->setDateTime((new DateTime($unavailable['start_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setStart($start);
 
         $end = new Google_Service_Calendar_EventDateTime();
-        $end->setDateTime(date3339(strtotime($unavailable['end_datetime'])));
+        $end->setDateTime((new DateTime($unavailable['end_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setEnd($end);
 
         // Add the new event to the google calendar.
@@ -299,18 +302,20 @@ class Google_Sync {
      */
     public function update_unavailable($provider, $unavailable)
     {
-        $this->framework->load->helper('general');
+        $this->CI->load->helper('general');
 
         $event = $this->service->events->get($provider['settings']['google_calendar'],
             $unavailable['id_google_calendar']);
         $event->setDescription($unavailable['notes']);
 
+        $timezone = new DateTimeZone($provider['timezone']);
+
         $start = new Google_Service_Calendar_EventDateTime();
-        $start->setDateTime(date3339(strtotime($unavailable['start_datetime'])));
+        $start->setDateTime((new DateTime($unavailable['start_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setStart($start);
 
         $end = new Google_Service_Calendar_EventDateTime();
-        $end->setDateTime(date3339(strtotime($unavailable['end_datetime'])));
+        $end->setDateTime((new DateTime($unavailable['end_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setEnd($end);
 
         $updated_event = $this->service->events->update($provider['settings']['google_calendar'],
@@ -362,11 +367,11 @@ class Google_Sync {
      */
     public function get_sync_events($google_calendar, $start, $end)
     {
-        $this->framework->load->helper('general');
+        $this->CI->load->helper('general');
 
         $params = [
-            'timeMin' => date3339($start),
-            'timeMax' => date3339($end),
+            'timeMin' => date(DateTime::RFC3339, $start),
+            'timeMax' => date(DateTime::RFC3339, $end),
             'singleEvents' => TRUE,
         ];
 

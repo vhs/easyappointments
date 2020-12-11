@@ -14,12 +14,18 @@
 /**
  * Services Model
  *
- * @property CI_DB_query_builder $db
- * @property CI_Loader $load
- *
  * @package Models
  */
-class Services_Model extends CI_Model {
+class Services_model extends EA_Model {
+    /**
+     * Services_Model constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->helper('data_validation');
+    }
+
     /**
      * Add (insert or update) a service record on the database
      *
@@ -55,14 +61,11 @@ class Services_Model extends CI_Model {
      */
     public function validate($service)
     {
-        $this->load->helper('data_validation');
-
-        // If record id is provided we need to check whether the record exists
-        // in the database.
+        // If record id is provided we need to check whether the record exists in the database.
         if (isset($service['id']))
         {
-            $num_rows = $this->db->get_where('services', ['id' => $service['id']])
-                ->num_rows();
+            $num_rows = $this->db->get_where('services', ['id' => $service['id']])->num_rows();
+
             if ($num_rows == 0)
             {
                 throw new Exception('Provided service id does not exist in the database.');
@@ -168,9 +171,11 @@ class Services_Model extends CI_Model {
      */
     public function exists($service)
     {
-        if ( ! isset($service['name'])
-            || ! isset($service['duration'])
-            || ! isset($service['price']))
+        if ( ! isset(
+            $service['name'],
+            $service['duration'],
+            $service['price']
+        ))
         {
             throw new Exception('Not all service fields are provided in order to check whether '
                 . 'a service record already exists: ' . print_r($service, TRUE));
@@ -182,16 +187,18 @@ class Services_Model extends CI_Model {
             'price' => $service['price']
         ])->num_rows();
 
-        return ($num_rows > 0) ? TRUE : FALSE;
+        return $num_rows > 0;
     }
 
     /**
      * Get the record id of an existing record.
      *
-     * NOTICE: The record must exist, otherwise an exception will be raised.
+     * Notice: The record must exist, otherwise an exception will be raised.
      *
      * @param array $service Contains the service record data. Name, duration and price values are mandatory for this
      * method to complete.
+     *
+     * @return int
      *
      * @throws Exception If required fields are missing.
      * @throws Exception If requested service was not found.
@@ -296,26 +303,31 @@ class Services_Model extends CI_Model {
         }
 
         $row_data = $this->db->get_where('services', ['id' => $service_id])->row_array();
-        if ( ! isset($row_data[$field_name]))
+
+        if ( ! array_key_exists($field_name, $row_data))
         {
-            throw new Exception('The given $field_name argument does not exist in the database: ' . $field_name);
+            throw new Exception('The given $field_name argument does not exist in the database: '
+                . $field_name);
         }
 
-        $setting = $this->db->get_where('services', ['id' => $service_id])->row_array();
-        return $setting[$field_name];
+        return $row_data[$field_name];
     }
 
     /**
      * Get all, or specific records from service's table.
      *
-     * @param string $whereClause (OPTIONAL) The WHERE clause of
-     * the query to be executed. DO NOT INCLUDE 'WHERE' KEYWORD.
+     * Example:
+     *
+     * $this->services_model->get_batch(['id' => $record_id]);
+     *
+     * @param mixed $where
+     * @param int|null $limit
+     * @param int|null $offset
+     * @param mixed $order_by
      *
      * @return array Returns the rows from the database.
-     * @example $this->Model->getBatch('id = ' . $recordId);
-     *
      */
-    public function get_batch($where = NULL, $order_by = NULL, $limit = NULL, $offset = NULL)
+    public function get_batch($where = NULL, $limit = NULL, $offset = NULL, $order_by = NULL)
     {
         if ($where !== NULL)
         {
@@ -471,9 +483,14 @@ class Services_Model extends CI_Model {
     /**
      * Get all service category records from database.
      *
+     * @param mixed $where
+     * @param int|null $limit
+     * @param int|null $offset
+     * @param mixed $order_by
+     *
      * @return array Returns an array that contains all the service category records.
      */
-    public function get_all_categories($where = NULL, $order_by = NULL, $limit = NULL, $offset = NULL)
+    public function get_all_categories($where = NULL, $limit = NULL, $offset = NULL, $order_by = NULL)
     {
         if ($where !== NULL)
         {

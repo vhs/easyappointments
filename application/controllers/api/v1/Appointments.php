@@ -6,8 +6,8 @@
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) 2013 - 2020, Alex Tselegidis
- * @license     http://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        http://easyappointments.org
+ * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
+ * @link        https://easyappointments.org
  * @since       v1.2.0
  * ---------------------------------------------------------------------------- */
 
@@ -19,30 +19,6 @@ use EA\Engine\Types\NonEmptyText;
 
 /**
  * Appointments Controller
- *
- * @property CI_Session $session
- * @property CI_Loader $load
- * @property CI_Input $input
- * @property CI_Output $output
- * @property CI_Config $config
- * @property CI_Lang $lang
- * @property CI_Cache $cache
- * @property CI_DB_query_builder $db
- * @property CI_Security $security
- * @property Google_Sync $google_sync
- * @property Ics_file $ics_file
- * @property Appointments_Model $appointments_model
- * @property Providers_Model $providers_model
- * @property Services_Model $services_model
- * @property Customers_Model $customers_model
- * @property Settings_Model $settings_model
- * @property Timezones $timezones
- * @property Notifications $notifications
- * @property Synchronization $synchronization
- * @property Roles_Model $roles_model
- * @property Secretaries_Model $secretaries_model
- * @property Admins_Model $admins_model
- * @property User_Model $user_model
  *
  * @package Controllers
  */
@@ -79,16 +55,16 @@ class Appointments extends API_V1_Controller {
     {
         try
         {
-            $conditions = [
+            $where = [
                 'is_unavailable' => FALSE
             ];
 
             if ($id !== NULL)
             {
-                $conditions['id'] = $id;
+                $where['id'] = $id;
             }
 
-            $appointments = $this->appointments_model->get_batch($conditions, NULL, NULL, NULL, array_key_exists('aggregates', $_GET));
+            $appointments = $this->appointments_model->get_batch($where, NULL, NULL, NULL, array_key_exists('aggregates', $_GET));
 
             if ($id !== NULL && count($appointments) === 0)
             {
@@ -121,7 +97,7 @@ class Appointments extends API_V1_Controller {
         {
             // Insert the appointment to the database.
             $request = new Request();
-            $appointment = $request->getBody();
+            $appointment = $request->get_body();
             $this->parser->decode($appointment);
 
             if (isset($appointment['id']))
@@ -159,7 +135,7 @@ class Appointments extends API_V1_Controller {
             $this->notifications->notify_appointment_saved($appointment, $service, $provider, $customer, $settings, FALSE);
 
             // Fetch the new object from the database and return it to the client.
-            $batch = $this->appointments_model->get_batch('id = ' . $id);
+            $batch = $this->appointments_model->get_batch(['id' => $id]);
             $response = new Response($batch);
             $status = new NonEmptyText('201 Created');
             $response->encode($this->parser)->singleEntry(TRUE)->output($status);
@@ -180,7 +156,7 @@ class Appointments extends API_V1_Controller {
         try
         {
             // Update the appointment record.
-            $batch = $this->appointments_model->get_batch('id = ' . $id);
+            $batch = $this->appointments_model->get_batch(['id' => $id]);
 
             if ($id !== NULL && count($batch) === 0)
             {
@@ -188,7 +164,7 @@ class Appointments extends API_V1_Controller {
             }
 
             $request = new Request();
-            $updated_appointment = $request->getBody();
+            $updated_appointment = $request->get_body();
             $base_appointment = $batch[0];
             $this->parser->decode($updated_appointment, $base_appointment);
             $updated_appointment['id'] = $id;
@@ -210,7 +186,7 @@ class Appointments extends API_V1_Controller {
 
 
             // Fetch the updated object from the database and return it to the client.
-            $batch = $this->appointments_model->get_batch('id = ' . $id);
+            $batch = $this->appointments_model->get_batch(['id' => $id]);
             $response = new Response($batch);
             $response->encode($this->parser)->singleEntry($id)->output();
         }

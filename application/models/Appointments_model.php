@@ -14,12 +14,19 @@
 /**
  * Appointments Model
  *
- * @property CI_DB_query_builder $db
- * @property CI_Loader $load
- *
  * @package Models
  */
-class Appointments_Model extends CI_Model {
+class Appointments_model extends EA_Model {
+    /**
+     * Appointments_Model constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->helper('data_validation');
+        $this->load->library('timezones');
+    }
+
     /**
      * Add an appointment record to the database.
      *
@@ -61,8 +68,6 @@ class Appointments_Model extends CI_Model {
      */
     public function validate($appointment)
     {
-        $this->load->helper('data_validation');
-
         // If a appointment id is given, check whether the record exists in the database.
         if (isset($appointment['id']))
         {
@@ -102,7 +107,8 @@ class Appointments_Model extends CI_Model {
             ->where('users.id', $appointment['id_users_provider'])
             ->where('roles.slug', DB_SLUG_PROVIDER)
             ->get()->num_rows();
-        if ($num_rows == 0)
+
+        if ($num_rows === 0)
         {
             throw new Exception('Appointment provider id is invalid.');
         }
@@ -117,15 +123,16 @@ class Appointments_Model extends CI_Model {
                 ->where('users.id', $appointment['id_users_customer'])
                 ->where('roles.slug', DB_SLUG_CUSTOMER)
                 ->get()->num_rows();
-            if ($num_rows == 0)
+
+            if ($num_rows === 0)
             {
                 throw new Exception('Appointment customer id is invalid.');
             }
 
             // Check if the service id is valid.
-            $num_rows = $this->db->get_where('services',
-                ['id' => $appointment['id_services']])->num_rows();
-            if ($num_rows == 0)
+            $num_rows = $this->db->get_where('services', ['id' => $appointment['id_services']])->num_rows();
+
+            if ($num_rows === 0)
             {
                 throw new Exception('Appointment service id is invalid.');
             }
@@ -206,11 +213,13 @@ class Appointments_Model extends CI_Model {
      */
     public function exists($appointment)
     {
-        if ( ! isset($appointment['start_datetime'])
-            || ! isset($appointment['end_datetime'])
-            || ! isset($appointment['id_users_provider'])
-            || ! isset($appointment['id_users_customer'])
-            || ! isset($appointment['id_services']))
+        if ( ! isset(
+            $appointment['start_datetime'],
+            $appointment['end_datetime'],
+            $appointment['id_users_provider'],
+            $appointment['id_users_customer'],
+            $appointment['id_services']
+        ))
         {
             throw new Exception('Not all appointment field values are provided: '
                 . print_r($appointment, TRUE));
@@ -225,7 +234,7 @@ class Appointments_Model extends CI_Model {
         ])
             ->num_rows();
 
-        return ($num_rows > 0) ? TRUE : FALSE;
+        return $num_rows > 0;
     }
 
     /**
@@ -310,8 +319,6 @@ class Appointments_Model extends CI_Model {
 
         $appointment = $this->db->get_where('appointments', ['id' => $appointment_id])->row_array();
 
-        $this->load->library('timezones');
-
         $appointment = $this->timezones->convert_event_timezone($appointment);
 
         return $appointment;
@@ -345,18 +352,16 @@ class Appointments_Model extends CI_Model {
 
         if ($this->db->get_where('appointments', ['id' => $appointment_id])->num_rows() == 0)
         {
-            throw new Exception('The record with the provided id '
-                . 'does not exist in the database: ' . $appointment_id);
+            throw new Exception('The record with the provided ID does not exist in the database: '
+                . $appointment_id);
         }
 
         $row_data = $this->db->get_where('appointments', ['id' => $appointment_id])->row_array();
 
-        if ( ! isset($row_data[$field_name]))
+        if ( ! array_key_exists($field_name, $row_data))
         {
             throw new Exception('The given field name does not exist in the database: ' . $field_name);
         }
-
-        $this->load->library('timezones');
 
         $row_data = $this->timezones->convert_event_timezone($row_data);
 
@@ -368,18 +373,19 @@ class Appointments_Model extends CI_Model {
      *
      * Example:
      *
-     * $this->Model->getBatch('id = ' . $recordId);
+     * $this->appointments_model->get_batch(['id' => $record_id]);
      *
-     * @param mixed|null $where (OPTIONAL) The WHERE clause of the query to be executed. DO NOT INCLUDE 'WHERE'
-     * KEYWORD.
-     * @param mixed|null $order_by
+     * @param mixed|null $where (OPTIONAL) The WHERE clause of the query to be executed.
      * @param int|null $limit
      * @param int|null $offset
+     * @param mixed|null $order_by
      * @param bool $aggregates (OPTIONAL) Defines whether to add aggregations or not.
      *
      * @return array Returns the rows from the database.
+     *
+     * @throws Exception
      */
-    public function get_batch($where = NULL, $order_by = NULL, $limit = NULL, $offset = NULL, $aggregates = FALSE)
+    public function get_batch($where = NULL, $limit = NULL, $offset = NULL, $order_by = NULL, $aggregates = FALSE)
     {
         if ($where !== NULL)
         {
@@ -392,8 +398,6 @@ class Appointments_Model extends CI_Model {
         }
 
         $appointments = $this->db->get('appointments', $limit, $offset)->result_array();
-
-        $this->load->library('timezones');
 
         foreach ($appointments as &$appointment)
         {
@@ -417,12 +421,18 @@ class Appointments_Model extends CI_Model {
      */
     private function get_aggregates(array $appointment)
     {
-        $appointment['service'] = $this->db->get_where('services',
-            ['id' => $appointment['id_services']])->row_array();
-        $appointment['provider'] = $this->db->get_where('users',
-            ['id' => $appointment['id_users_provider']])->row_array();
-        $appointment['customer'] = $this->db->get_where('users',
-            ['id' => $appointment['id_users_customer']])->row_array();
+        $appointment['service'] = $this->db->get_where('services', [
+            'id' => $appointment['id_services']
+        ])->row_array();
+
+        $appointment['provider'] = $this->db->get_where('users', [
+            'id' => $appointment['id_users_provider']
+        ])->row_array();
+
+        $appointment['customer'] = $this->db->get_where('users', [
+            'id' => $appointment['id_users_customer']
+        ])->row_array();
+
         return $appointment;
     }
 
@@ -441,6 +451,7 @@ class Appointments_Model extends CI_Model {
         // Validate period
         $start = strtotime($unavailable['start_datetime']);
         $end = strtotime($unavailable['end_datetime']);
+
         if ($start > $end)
         {
             throw new Exception('Unavailable period start must be prior to end.');
@@ -493,7 +504,7 @@ class Appointments_Model extends CI_Model {
 
         $num_rows = $this->db->get_where('appointments', ['id' => $unavailable_id])->num_rows();
 
-        if ($num_rows == 0)
+        if ($num_rows === 0)
         {
             return FALSE; // Record does not exist.
         }
@@ -517,8 +528,9 @@ class Appointments_Model extends CI_Model {
             throw new Exception('Invalid argument type $provider_id: ' . $provider_id);
         }
 
-        $this->db->update('appointments', ['id_google_calendar' => NULL],
-            ['id_users_provider' => $provider_id]);
+        $this->db->update('appointments', ['id_google_calendar' => NULL], [
+            'id_users_provider' => $provider_id
+        ]);
     }
 
     /**
@@ -544,11 +556,17 @@ class Appointments_Model extends CI_Model {
      * @param DateTime $slot_start When the slot starts
      * @param DateTime $slot_end When the slot ends.
      * @param int $service_id Selected service ID.
+     * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
      *
      * @return int Returns the number of attendants for selected time period.
      */
-    public function get_attendants_number_for_period(DateTime $slot_start, DateTime $slot_end, $service_id)
+    public function get_attendants_number_for_period(DateTime $slot_start, DateTime $slot_end, $service_id, $exclude_appointment_id = NULL)
     {
+        if ($exclude_appointment_id)
+        {
+            $this->db->where('id !=', $exclude_appointment_id);
+        }
+
         return (int)$this->db
             ->select('count(*) AS attendants_number')
             ->from('appointments')

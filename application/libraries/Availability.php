@@ -19,7 +19,7 @@
  */
 class Availability {
     /**
-     * @var CI_Controller
+     * @var EA_Controller
      */
     protected $CI;
 
@@ -58,7 +58,7 @@ class Availability {
 
         if ($service['attendants_number'] > 1)
         {
-            $available_hours = $this->consider_multiple_attendants($date, $service, $provider);
+            $available_hours = $this->consider_multiple_attendants($date, $service, $provider, $exclude_appointment_id);
         }
 
         return $this->consider_book_advance_timeout($date, $available_hours, $provider);
@@ -79,7 +79,7 @@ class Availability {
      *
      * @throws Exception
      */
-    public function get_available_periods(
+    protected function get_available_periods(
         $date,
         $provider,
         $exclude_appointment_id = NULL
@@ -106,7 +106,9 @@ class Availability {
 
         // Find the empty spaces on the plan. The first split between the plan is due to a break (if any). After that
         // every reserved appointment is considered to be a taken space in the plan.
-        $date_working_plan = $working_plan[strtolower(date('l', strtotime($date)))];
+        $working_day = strtolower(date('l', strtotime($date)));
+
+        $date_working_plan = $working_plan[$working_day] ?? NULL;
 
         // Search if the $date is an custom availability period added outside the normal working plan.
         if (isset($working_plan_exceptions[$date]))
@@ -338,6 +340,7 @@ class Availability {
      * @param string $date Selected date (Y-m-d).
      * @param array $service Service record.
      * @param array $provider Provider record.
+     * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
      *
      * @return array Returns the available hours array.
      *
@@ -346,7 +349,8 @@ class Availability {
     protected function consider_multiple_attendants(
         $date,
         $service,
-        $provider
+        $provider,
+        $exclude_appointment_id = NULL
     )
     {
         $unavailability_events = $this->CI->appointments_model->get_batch([
@@ -356,17 +360,32 @@ class Availability {
         ]);
 
         $working_plan = json_decode($provider['settings']['working_plan'], TRUE);
+
+        $working_plan_exceptions = json_decode($provider['settings']['working_plan_exceptions'], TRUE);
+
         $working_day = strtolower(date('l', strtotime($date)));
-        $working_hours = $working_plan[$working_day];
+
+        $date_working_plan = $working_plan[$working_day] ?? NULL;
+
+        // Search if the $date is an custom availability period added outside the normal working plan.
+        if (isset($working_plan_exceptions[$date]))
+        {
+            $date_working_plan = $working_plan_exceptions[$date];
+        }
+
+        if ( ! $date_working_plan)
+        {
+            return [];
+        }
 
         $periods = [
             [
-                'start' => new DateTime($date . ' ' . $working_hours['start']),
-                'end' => new DateTime($date . ' ' . $working_hours['end'])
+                'start' => new DateTime($date . ' ' . $date_working_plan['start']),
+                'end' => new DateTime($date . ' ' . $date_working_plan['end'])
             ]
         ];
 
-        $periods = $this->remove_breaks($date, $periods, $working_hours['breaks']);
+        $periods = $this->remove_breaks($date, $periods, $date_working_plan['breaks']);
         $periods = $this->remove_unavailability_events($periods, $unavailability_events);
 
         $hours = [];
@@ -387,7 +406,8 @@ class Availability {
                 $appointment_attendants_number = $this->CI->appointments_model->get_attendants_number_for_period(
                     $slot_start,
                     $slot_end,
-                    $service['id']
+                    $service['id'],
+                    $exclude_appointment_id
                 );
 
                 if ($appointment_attendants_number < $service['attendants_number'])

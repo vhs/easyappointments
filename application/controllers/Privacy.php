@@ -6,39 +6,27 @@
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
  * @copyright   Copyright (c) 2013 - 2020, Alex Tselegidis
- * @license     http://opensource.org/licenses/GPL-3.0 - GPLv3
- * @link        http://easyappointments.org
+ * @license     https://opensource.org/licenses/GPL-3.0 - GPLv3
+ * @link        https://easyappointments.org
  * @since       v1.3.2
  * ---------------------------------------------------------------------------- */
 
 /**
  * Class Privacy
  *
- * @property CI_Session $session
- * @property CI_Loader $load
- * @property CI_Input $input
- * @property CI_Output $output
- * @property CI_Config $config
- * @property CI_Lang $lang
- * @property CI_Cache $cache
- * @property CI_DB_query_builder $db
- * @property CI_Security $security
- * @property Google_Sync $google_sync
- * @property Ics_file $ics_file
- * @property Appointments_Model $appointments_model
- * @property Providers_Model $providers_model
- * @property Services_Model $services_model
- * @property Customers_Model $customers_model
- * @property Settings_Model $settings_model
- * @property Timezones $timezones
- * @property Roles_Model $roles_model
- * @property Secretaries_Model $secretaries_model
- * @property Admins_Model $admins_model
- * @property User_Model $user_model
- *
  * @package Controllers
  */
-class Privacy extends CI_Controller {
+class Privacy extends EA_Controller {
+    /**
+     * Privacy constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->driver('cache', ['adapter' => 'file']);
+        $this->load->model('customers_model');
+    }
+
     /**
      * Remove all customer data (including appointments from the system).
      */
@@ -53,8 +41,6 @@ class Privacy extends CI_Controller {
                 throw new InvalidArgumentException('Invalid customer token value provided.');
             }
 
-            $this->load->driver('cache', ['adapter' => 'file']);
-
             $customer_id = $this->cache->get('customer-token-' . $customer_token);
 
             if (empty($customer_id))
@@ -62,8 +48,6 @@ class Privacy extends CI_Controller {
                 throw new InvalidArgumentException('Customer ID could not be found, please reload the page '
                     . 'and try again.');
             }
-
-            $this->load->model('customers_model');
 
             $this->customers_model->delete($customer_id);
 
