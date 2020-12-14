@@ -385,6 +385,10 @@ class Availability {
             ]
         ];
 
+        if($date_working_plan['end'] == '00:00') {
+            $periods[0]['end']->modify('+1 day');
+        }
+
         $periods = $this->remove_breaks($date, $periods, $date_working_plan['breaks']);
         $periods = $this->remove_unavailability_events($periods, $unavailability_events);
 
