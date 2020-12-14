@@ -1,0 +1,26 @@
+version: "3.1"
+services:
+    server:
+        env_file:
+        - server/env
+        secrets:
+        - SMTP_HOST
+        - SMTP_USER
+        - SMTP_PASS
+        - SMTP_CRYPTO
+        - SMTP_PORT
+        volumes:
+        - ../config.php:/var/www/html/config.php
+        - ./server/config.email-secrets.php:/var/www/html/application/config/email.php
+
+secrets:
+    SMTP_HOST:
+        file: secrets/SMTP_HOST
+    SMTP_USER:
+        file: secrets/SMTP_USER
+    SMTP_PASS:
+        file: secrets/SMTP_PASS
+    SMTP_CRYPTO:
+        file: secrets/SMTP_CRYPTO
+    SMTP_PORT:
+        file: secrets/SMTP_PORT
