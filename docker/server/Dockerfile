@@ -29,6 +29,7 @@ COPY composer.json .
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename composer
 RUN composer update
 
+COPY index.php .
 ADD application/ ./application/
 ADD assets/ ./assets/
 ADD engine/ ./engine/
