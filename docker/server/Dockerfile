@@ -35,9 +35,9 @@ ADD assets/ ./assets/
 ADD engine/ ./engine/
 ADD storage/ ./storage/
 
-VOLUME [ "/var/www/html/storage" ]
-
 RUN chmod 1777 storage/backups storage/cache storage/logs storage/sessions storage/uploads
+
+VOLUME [ "/var/www/html/storage" ]
 
 COPY config-sample.php ./config.php
 
