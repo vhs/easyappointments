@@ -29,10 +29,17 @@ COPY composer.json .
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename composer
 RUN composer update
 
-COPY application assets engine ./
+ADD application/ ./application/
+ADD assets/ ./assets/
+ADD engine/ ./engine/
+ADD storage/ ./storage/
+
+VOLUME [ "/var/www/html/storage" ]
+
+RUN chmod 1777 storage/backups storage/cache storage/logs storage/sessions storage/uploads
 
 COPY config-sample.php ./config.php
 
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash - \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs
 RUN npm install
