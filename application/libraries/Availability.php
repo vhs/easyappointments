@@ -56,7 +56,7 @@ class Availability {
 
         $available_hours = $this->generate_available_hours($date, $service, $available_periods);
 
-        if ($service['attendants_number'] > 1)
+        if ($this->CI->appointments_model->get_attendants_number_for_service_category($service['id']) > 1)
         {
             $available_hours = $this->consider_multiple_attendants($date, $service, $provider, $exclude_appointment_id);
         }
