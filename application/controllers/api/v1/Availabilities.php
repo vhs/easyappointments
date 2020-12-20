@@ -411,10 +411,11 @@ class Availabilities extends API_V1_Controller {
             while ($slot_end <= $period['end'])
             {
                 // Check reserved attendants for this time slot and see if current attendants fit.
-                $appointment_attendants_number = $this->appointments_model->get_attendants_number_for_period($slot_start,
+                $appointment_attendants_number = $this->appointments_model->get_attendants_number_for_period_and_category($slot_start,
                     $slot_end, $service['id']);
 
-                if ($appointment_attendants_number < $service['attendants_number'])
+                $max_available_attendants = $this->appointments_model->get_attendants_number_for_service_category($service['id']);
+                if ($appointment_attendants_number < $max_available_attendants)
                 {
                     $hours[] = $slot_start->format('H:i');
                 }

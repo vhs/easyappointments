@@ -407,14 +407,15 @@ class Availability {
             while ($slot_end <= $period['end'])
             {
                 // Check reserved attendants for this time slot and see if current attendants fit.
-                $appointment_attendants_number = $this->CI->appointments_model->get_attendants_number_for_period(
+                $appointment_attendants_number = $this->CI->appointments_model->get_attendants_number_for_period_and_category(
                     $slot_start,
                     $slot_end,
                     $service['id'],
                     $exclude_appointment_id
                 );
 
-                if ($appointment_attendants_number < $service['attendants_number'])
+                $max_available_attendants = $this->CI->appointments_model->get_attendants_number_for_service_category($service['id']);
+                if ($appointment_attendants_number < $max_available_attendants)
                 {
                     $hours[] = $slot_start->format('H:i');
                 }
