@@ -585,4 +585,65 @@ class Appointments_model extends EA_Model {
             ->row()
             ->attendants_number;
     }
+
+    /**
+     * Returns the attendants number for selection period grouped by Service category
+     *
+     * @param DateTime $slot_start When the slot starts
+     * @param DateTime $slot_end When the slot ends.
+     * @param int $service_id Selected service ID.
+     * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
+     *
+     * @return int Returns the number of attendants for selected time period.
+     */
+    public function get_attendants_number_for_period_and_category(DateTime $slot_start, DateTime $slot_end, $service_id, $exclude_appointment_id = NULL)
+    {
+        if ($exclude_appointment_id)
+        {
+            $this->db->where('id !=', $exclude_appointment_id);
+        }
+
+        $category = $this->db->get_where('services', ['id' => $service_id])->row()->id_service_categories;
+
+        return (int)$this->db
+            ->select('count(*) AS attendants_number')
+            ->from('appointments')
+            ->join('services', 'appointments.id_services = services.id', 'inner')
+            ->group_start()
+            ->where('id_service_categories', $category)
+            ->group_start()
+            ->where('start_datetime <=', $slot_start->format('Y-m-d H:i:s'))
+            ->where('end_datetime >', $slot_start->format('Y-m-d H:i:s'))
+            ->group_end()
+            ->or_group_start()
+            ->where('start_datetime <', $slot_end->format('Y-m-d H:i:s'))
+            ->where('end_datetime >=', $slot_end->format('Y-m-d H:i:s'))
+            ->group_end()
+            ->group_end()
+            ->get()
+            ->row()
+            ->attendants_number;
+    }
+
+    /**
+     * Returns maximum attendants number for a given service id grouped by category
+     *
+     * @param DateTime $slot_start When the slot starts
+     * @param DateTime $slot_end When the slot ends.
+     * @param int $service_id Selected service ID.
+     * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
+     *
+     * @return int Returns the number of attendants for selected time period.
+     */
+    public function get_attendants_number_for_service_category($service_id)
+    {
+        $category = $this->db->get_where('services', ['id' => $service_id])->row()->id_service_categories;
+        return (int)$this->db
+            ->select_sum('attendants_number')
+            ->from('services')
+            ->where('id_service_categories', $category)
+            ->get()
+            ->row()
+            ->attendants_number;
+    }
 }
