@@ -116,9 +116,9 @@ class Services_model extends EA_Model {
         }
 
         if ($service['attendants_number'] !== NULL && ( ! is_numeric($service['attendants_number'])
-                || $service['attendants_number'] < 1))
+                || $service['attendants_number'] < 0))
         {
-            throw new Exception('Service attendants number must be numeric and greater or equal to one: '
+            throw new Exception('Service attendants number must be numeric and greater or equal to zero: '
                 . $service['attendants_number']);
         }
 
