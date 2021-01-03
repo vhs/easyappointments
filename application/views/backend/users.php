@@ -261,9 +261,9 @@
                                     <div class="form-group">
                                         <label for="provider-timezone">
                                             <?= lang('timezone') ?>
-                                            <span class="text-danger">*</span>
+
                                         </label>
-                                        <?= render_timezone_dropdown('id="provider-timezone" class="form-control required"') ?>
+                                        <?= render_timezone_dropdown('id="provider-timezone" class="form-control"') ?>
                                     </div>
 
                                     <br>
@@ -549,9 +549,9 @@
                             <div class="form-group">
                                 <label for="secretary-timezone">
                                     <?= lang('timezone') ?>
-                                    <span class="text-danger">*</span>
+
                                 </label>
-                                <?= render_timezone_dropdown('id="secretary-timezone" class="form-control required"') ?>
+                                <?= render_timezone_dropdown('id="secretary-timezone" class="form-control"') ?>
                             </div>
 
                             <br>
@@ -757,9 +757,8 @@
                             <div class="form-group">
                                 <label for="admin-timezone">
                                     <?= lang('timezone') ?>
-                                    <span class="text-danger">*</span>
                                 </label>
-                                <?= render_timezone_dropdown('id="admin-timezone" class="form-control required"') ?>
+                                <?= render_timezone_dropdown('id="admin-timezone" class="form-control"') ?>
                             </div>
 
                             <br>

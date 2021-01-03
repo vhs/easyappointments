@@ -84,7 +84,7 @@ class Appointments extends API_V1_Controller {
         }
         catch (Exception $exception)
         {
-            $this->handle_exception($exception);
+            exit($this->handle_exception($exception));
         }
     }
 
@@ -120,7 +120,6 @@ class Appointments extends API_V1_Controller {
 
             $id = $this->appointments_model->add($appointment);
 
-            $appointment = $this->appointments_model->get_row($id);
             $service = $this->services_model->get_row($appointment['id_services']);
             $provider = $this->providers_model->get_row($appointment['id_users_provider']);
             $customer = $this->customers_model->get_row($appointment['id_users_customer']);
@@ -143,7 +142,7 @@ class Appointments extends API_V1_Controller {
         }
         catch (Exception $exception)
         {
-            $this->handle_exception($exception);
+            exit($this->handle_exception($exception));
         }
     }
 
@@ -193,7 +192,7 @@ class Appointments extends API_V1_Controller {
         }
         catch (Exception $exception)
         {
-            $this->handle_exception($exception);
+            exit($this->handle_exception($exception));
         }
     }
 
@@ -232,7 +231,7 @@ class Appointments extends API_V1_Controller {
         }
         catch (Exception $exception)
         {
-            $this->handle_exception($exception);
+            exit($this->handle_exception($exception));
         }
     }
 }

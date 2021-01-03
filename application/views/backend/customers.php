@@ -154,17 +154,16 @@
                     <div class="form-group">
                         <label for="language">
                             <?= lang('language') ?>
-                            <span class="text-danger">*</span>
+
                         </label>
-                        <select id="language" class="form-control required"></select>
+                        <select id="language" class="form-control"></select>
                     </div>
 
                     <div class="form-group">
                         <label for="timezone">
                             <?= lang('timezone') ?>
-                            <span class="text-danger">*</span>
                         </label>
-                        <?= render_timezone_dropdown('id="timezone" class="form-control required"') ?>
+                        <?= render_timezone_dropdown('id="timezone" class="form-control"') ?>
                     </div>
 
                     <div class="form-group">

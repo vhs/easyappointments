@@ -12,15 +12,15 @@
  * ---------------------------------------------------------------------------- */
 
 /**
- * Class Google_sync
+ * Google Synchronization Class
  *
- * This class implements all the core synchronization between the Google Calendar and the Easy!Appointments system.
- *
- * Do not place any model handling inside this library.
+ * This class implements all the core synchronization between the Google Calendar
+ * and the Easy!Appointments system. Do not place any model handling inside this
+ * library.
  *
  * @package Libraries
  */
-class Google_sync {
+class Google_Sync {
     /**
      * CodeIgniter Instance
      *

@@ -65,7 +65,6 @@ $lang['log_out'] = 'יציאה';
 $lang['synchronize'] = 'סינכרון';
 $lang['enable_sync'] = 'אפשר סינכרון';
 $lang['disable_sync'] = 'בטל סינכרון';
-$lang['disable_sync_prompt'] = 'Are you sure that you want to disable the calendar synchronization?';
 $lang['reload'] = 'רענון';
 $lang['appointment'] = 'פגישה';
 $lang['unavailable'] = 'אינו זמין';

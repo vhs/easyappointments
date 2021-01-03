@@ -29,7 +29,7 @@ class Services implements ParsersInterface {
     public function encode(array &$response)
     {
         $encoded_response = [
-            'id' => array_key_exists('id', $response) ? (int)$response['id'] : NULL,
+            'id' => $response['id'] !== NULL ? (int)$response['id'] : NULL,
             'name' => $response['name'],
             'duration' => (int)$response['duration'],
             'price' => (float)$response['price'],
@@ -54,52 +54,52 @@ class Services implements ParsersInterface {
     {
         $decoded_request = $base ?: [];
 
-        if (array_key_exists('id', $request))
+        if ( ! empty($request['id']))
         {
             $decoded_request['id'] = $request['id'];
         }
 
-        if (array_key_exists('name', $request))
+        if ( ! empty($request['name']))
         {
             $decoded_request['name'] = $request['name'];
         }
 
-        if (array_key_exists('duration', $request))
+        if ( ! empty($request['duration']))
         {
             $decoded_request['duration'] = $request['duration'];
         }
 
-        if (array_key_exists('price', $request))
+        if ( ! empty($request['price']))
         {
             $decoded_request['price'] = $request['price'];
         }
 
-        if (array_key_exists('currency', $request))
+        if ( ! empty($request['currency']))
         {
             $decoded_request['currency'] = $request['currency'];
         }
 
-        if (array_key_exists('description', $request))
+        if ( ! empty($request['description']))
         {
             $decoded_request['description'] = $request['description'];
         }
 
-        if (array_key_exists('location', $request))
+        if ( ! empty($request['location']))
         {
             $decoded_request['location'] = $request['location'];
         }
 
-        if (array_key_exists('availabilitiesType', $request))
+        if ( ! empty($request['availabilitiesType']))
         {
             $decoded_request['availabilities_type'] = $request['availabilitiesType'];
         }
 
-        if (array_key_exists('attendantsNumber', $request))
+        if ( ! empty($request['attendantsNumber']))
         {
             $decoded_request['attendants_number'] = $request['attendantsNumber'];
         }
 
-        if (array_key_exists('categoryId', $request))
+        if ( ! empty($request['categoryId']))
         {
             $decoded_request['id_service_categories'] = $request['categoryId'];
         }

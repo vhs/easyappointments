@@ -259,7 +259,6 @@
             .find('input, select, textarea')
             .val('')
             .prop('disabled', true);
-        $('.record-details #timezone').val('UTC');
 
         $('#language').val('english');
 
@@ -351,7 +350,7 @@
                     // Timezone
 
                     $('<small/>', {
-                        'text': GlobalVariables.timezones[appointment.provider.timezone]
+                        'text': GlobalVariables.timezones[GlobalVariables.user.timezone]
                     })
                 ]
             })

@@ -24,6 +24,7 @@ class Appointments_model extends EA_Model {
     {
         parent::__construct();
         $this->load->helper('data_validation');
+        $this->load->library('timezones');
     }
 
     /**
@@ -316,7 +317,11 @@ class Appointments_model extends EA_Model {
                 . $appointment_id);
         }
 
-        return $this->db->get_where('appointments', ['id' => $appointment_id])->row_array();
+        $appointment = $this->db->get_where('appointments', ['id' => $appointment_id])->row_array();
+
+        $appointment = $this->timezones->convert_event_timezone($appointment);
+
+        return $appointment;
     }
 
     /**
@@ -358,6 +363,8 @@ class Appointments_model extends EA_Model {
             throw new Exception('The given field name does not exist in the database: ' . $field_name);
         }
 
+        $row_data = $this->timezones->convert_event_timezone($row_data);
+
         return $row_data[$field_name];
     }
 
@@ -394,6 +401,8 @@ class Appointments_model extends EA_Model {
 
         foreach ($appointments as &$appointment)
         {
+            $appointment = $this->timezones->convert_event_timezone($appointment);
+
             if ($aggregates)
             {
                 $appointment = $this->get_aggregates($appointment);
@@ -547,12 +556,11 @@ class Appointments_model extends EA_Model {
      * @param DateTime $slot_start When the slot starts
      * @param DateTime $slot_end When the slot ends.
      * @param int $service_id Selected service ID.
-     * @param int $provider_id Selected provider ID.
      * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
      *
      * @return int Returns the number of attendants for selected time period.
      */
-    public function get_attendants_number_for_period(DateTime $slot_start, DateTime $slot_end, $service_id, $provider_id, $exclude_appointment_id = NULL)
+    public function get_attendants_number_for_period(DateTime $slot_start, DateTime $slot_end, $service_id, $exclude_appointment_id = NULL)
     {
         if ($exclude_appointment_id)
         {
@@ -573,44 +581,6 @@ class Appointments_model extends EA_Model {
             ->group_end()
             ->group_end()
             ->where('id_services', $service_id)
-            ->where('id_users_provider', $provider_id)
-            ->get()
-            ->row()
-            ->attendants_number;
-    }
-
-    /**
-     * Returns the number of the other service attendants number for the provided time slot.
-     *
-     * @param DateTime $slot_start When the slot starts
-     * @param DateTime $slot_end When the slot ends.
-     * @param int $service_id Selected service ID.
-     * @param int|null $exclude_appointment_id Exclude an appointment from the availability generation.
-     *
-     * @return int Returns the number of attendants for selected time period.
-     */
-    public function get_other_service_attendants_number(DateTime $slot_start, DateTime $slot_end, $service_id, $provider_id, $exclude_appointment_id = NULL)
-    {
-        if ($exclude_appointment_id)
-        {
-            $this->db->where('id !=', $exclude_appointment_id);
-        }
-
-        return (int)$this->db
-            ->select('count(*) AS attendants_number')
-            ->from('appointments')
-            ->group_start()
-            ->group_start()
-            ->where('start_datetime <=', $slot_start->format('Y-m-d H:i:s'))
-            ->where('end_datetime >', $slot_start->format('Y-m-d H:i:s'))
-            ->group_end()
-            ->or_group_start()
-            ->where('start_datetime <', $slot_end->format('Y-m-d H:i:s'))
-            ->where('end_datetime >=', $slot_end->format('Y-m-d H:i:s'))
-            ->group_end()
-            ->group_end()
-            ->where('id_services !=', $service_id)
-            ->where('id_users_provider', $provider_id)
             ->get()
             ->row()
             ->attendants_number;

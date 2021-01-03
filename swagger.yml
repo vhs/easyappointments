@@ -798,15 +798,15 @@ paths:
                     schema:
                         items:
                             $ref: '#/definitions/Setting'
-    '/settings/{settingName}':
+    '/settings/{settingId}':
         get:
             tags:
                 - settings
             summary: Get single setting
             parameters:
-                -   name: settingName
+                -   name: settingId
                     in: path
-                    type: string
+                    type: integer
                     required: true
             responses:
                 '200':
@@ -818,7 +818,7 @@ paths:
                 - settings
             summary: Update single setting
             parameters:
-                -   name: settingName
+                -   name: settingId
                     in: path
                     type: integer
                     required: true
@@ -836,7 +836,7 @@ paths:
                 - settings
             summary: Delete single setting
             parameters:
-                -   name: settingName
+                -   name: settingId
                     in: path
                     type: integer
                     required: true
@@ -977,8 +977,6 @@ definitions:
                 type: string
             notes:
                 type: string
-            timezone:
-                type: string
             settings:
                 type: object
                 properties:
@@ -1014,8 +1012,6 @@ definitions:
                 type: string
             notes:
                 type: string
-            timezone:
-                type: string
             services:
                 type: array
                 items:
@@ -1030,7 +1026,7 @@ definitions:
                     notifications:
                         type: boolean
                     calendarView:
-                        type: string
+                        type: boolean
                     googleSync:
                         type: boolean
                     googleCalendar:
@@ -1066,8 +1062,6 @@ definitions:
             zip:
                 type: string
             notes:
-                type: string
-            timezone:
                 type: string
             providers:
                 type: array

@@ -308,12 +308,8 @@
 
         $('#admins .add-edit-delete-group').show();
         $('#admins .save-cancel-group').hide();
-        $('#admins .record-details')
-            .find('input, select, textarea')
-            .val('')
-            .prop('disabled', true);
-        $('#admins .record-details #admin-calendar-view').val('default');
-        $('#admins .record-details #admin-timezone').val('UTC');
+        $('#admins .record-details').find('input, select, textarea').prop('disabled', true);
+        $('#admins .record-details').find('input, textarea').val('');
         $('#edit-admin, #delete-admin').prop('disabled', true);
 
         $('#admins .has-error').removeClass('has-error');

@@ -87,19 +87,9 @@ class Secretaries extends API_V1_Controller {
             $secretary = $request->get_body();
             $this->parser->decode($secretary);
 
-            if (array_key_exists('id', $secretary))
+            if (isset($secretary['id']))
             {
                 unset($secretary['id']);
-            }
-
-            if ( ! array_key_exists('providers', $secretary))
-            {
-                throw new Exception('No providers property provided.');
-            }
-
-            if ( ! array_key_exists('settings', $secretary))
-            {
-                throw new Exception('No settings property provided.');
             }
 
             $id = $this->secretaries_model->add($secretary);

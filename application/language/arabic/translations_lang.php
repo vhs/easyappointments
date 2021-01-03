@@ -1,4 +1,4 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
 // Arabic
 $lang['page_title'] = 'احجز موعد مع';
 $lang['service_and_provider'] = 'اختر الخدمة والمزود';
@@ -60,7 +60,6 @@ $lang['log_out'] = 'تسجيل الخروج';
 $lang['synchronize'] = 'المزامنة';
 $lang['enable_sync'] = 'تمكين المزامنة';
 $lang['disable_sync'] = 'تعطيل المزامنة';
-$lang['disable_sync_prompt'] = 'Are you sure that you want to disable the calendar synchronization?';
 $lang['reload'] = 'اعادة التحميل';
 $lang['appointment'] = 'الموعد';
 $lang['unavailable'] = 'غير متوفر';
