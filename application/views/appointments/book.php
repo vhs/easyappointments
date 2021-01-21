@@ -157,7 +157,7 @@
                                                 echo '<optgroup label="' . $group_label . '">';
                                                 foreach ($group as $service)
                                                 {
-                                                    echo '<option value="' . $service['id'] . '">'
+						     echo '<option value="' . $service['id'] . '"' . ($service['name'] == urldecode($_GET['service'])?" selected":"") . '>'
                                                         . $service['name'] . '</option>';
                                                 }
                                                 echo '</optgroup>';
