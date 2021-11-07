@@ -312,6 +312,7 @@ class Availability {
         {
             $start_hour = new DateTime($date . ' ' . $period['start']);
             $end_hour = new DateTime($date . ' ' . $period['end']);
+
             if($period['end'] == '00:00') {
                 $end_hour->modify('+1 day');
             }
@@ -320,10 +321,11 @@ class Availability {
 
             $current_hour = $start_hour;
             $diff = $current_hour->diff($end_hour);
-
+            
             while ((($diff->d * 24*60) + ($diff->h * 60) + $diff->i) >= (int)$service['duration'])
             {
                 $available_hours[] = $current_hour->format('H:i');
+                $available_hours = array_unique($available_hours);
                 $current_hour->add(new DateInterval('PT' . $interval . 'M'));
                 $diff = $current_hour->diff($end_hour);
             }
