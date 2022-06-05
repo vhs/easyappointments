@@ -9,7 +9,7 @@ services:
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_DATABASE=easyappointments
         restart: unless-stopped
-        
+
     server:
         depends_on:
             - mysql

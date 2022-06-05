@@ -1,0 +1,11 @@
+version: "3.1"
+
+services:
+  server:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.booking-prod.entryPoints=web,websecure"
+      - "traefik.http.routers.booking-prod.rule=Host(`booking.vanhack.ca`)"
+      - "traefik.http.routers.booking-prod.tls=true"
+      - "traefik.http.routers.booking-prod.tls.certresolver=lets-encrypt"
